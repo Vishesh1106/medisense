@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediSense – Smart Health Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #1a7a5e; --green-lt: #e8f5f1; --green-md: #2fa882;
+      --navy: #0f2139; --slate: #4a5568; --muted: #718096;
+      --line: #e2e8f0; --white: #fff; --bg: #f7fafc;
+      --red: #e53e3e; --amber: #dd6b20; --radius: 12px;
+      --shadow: 0 4px 24px rgba(15,33,57,.08);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--navy); line-height: 1.6; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--white); border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw; height: 64px;
+    }
+    .logo { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--green); display:flex; align-items:center; gap:8px; text-decoration:none; }
+    .nav-links { display:flex; gap:28px; list-style:none; }
+    .nav-links a { text-decoration:none; color:var(--slate); font-size:.9rem; font-weight:500; transition:color .2s; }
+    .nav-links a:hover { color:var(--green); }
+    .nav-auth { display:flex; gap:10px; align-items:center; }
+    .btn-ghost { background:none; border:1.5px solid var(--line); color:var(--slate); padding:7px 16px; border-radius:8px; font-size:.85rem; font-weight:600; cursor:pointer; transition:all .2s; font-family:inherit; }
+    .btn-ghost:hover { border-color:var(--green); color:var(--green); }
+    .btn-nav { background:var(--green); color:#fff; padding:8px 18px; border-radius:8px; font-size:.85rem; font-weight:600; cursor:pointer; border:none; font-family:inherit; transition:background .2s; }
+    .btn-nav:hover { background:#155f49; }
+    #user-info { display:none; align-items:center; gap:12px; }
+    .user-badge { background:var(--green-lt); color:var(--green); padding:6px 14px; border-radius:20px; font-size:.82rem; font-weight:600; }
+    .btn-logout { background:none; border:none; color:var(--muted); font-size:.82rem; cursor:pointer; font-family:inherit; }
+    .btn-logout:hover { color:var(--red); }
+
+    /* ── BUTTONS ── */
+    .btn-primary { background:var(--green); color:#fff; padding:13px 26px; border-radius:var(--radius); font-weight:600; font-size:.95rem; text-decoration:none; border:none; cursor:pointer; transition:background .2s; display:inline-block; font-family:inherit; }
+    .btn-primary:hover { background:#155f49; }
+    .btn-outline { border:2px solid var(--green); color:var(--green); padding:11px 26px; border-radius:var(--radius); font-weight:600; font-size:.95rem; text-decoration:none; background:none; cursor:pointer; transition:all .2s; font-family:inherit; }
+    .btn-outline:hover { background:var(--green-lt); }
+
+    /* ── HERO ── */
+    .hero { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; padding:72px 5vw 56px; max-width:1200px; margin:auto; }
+    .hero-badge { display:inline-flex; align-items:center; gap:6px; background:var(--green-lt); color:var(--green); font-size:.78rem; font-weight:600; padding:4px 12px; border-radius:20px; margin-bottom:16px; }
+    .hero h1 { font-family:'Playfair Display',serif; font-size:clamp(1.9rem,3.5vw,2.9rem); line-height:1.2; margin-bottom:18px; }
+    .hero h1 span { color:var(--green); }
+    .hero p { color:var(--slate); font-size:1rem; max-width:460px; margin-bottom:28px; }
+    .hero-btns { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:32px; }
+    .stat-pills { display:flex; gap:24px; }
+    .stat strong { display:block; font-size:1.5rem; font-weight:700; color:var(--green); }
+    .stat span { font-size:.78rem; color:var(--muted); }
+    .hero-card { background:var(--white); border-radius:20px; padding:24px; box-shadow:var(--shadow); border:1px solid var(--line); }
+    .hero-card-title { font-weight:600; margin-bottom:14px; display:flex; align-items:center; gap:8px; font-size:.92rem; }
+    .symptom-chip { display:inline-block; background:var(--green-lt); color:var(--green); border-radius:20px; padding:5px 12px; font-size:.78rem; font-weight:500; margin:3px; }
+    .result-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--line); }
+    .result-row:last-child { border:none; }
+    .result-label { font-size:.82rem; color:var(--muted); }
+    .result-val { font-size:.88rem; font-weight:600; }
+    .confidence { background:#e6fffa; color:#2c7a7b; font-size:.75rem; padding:2px 8px; border-radius:10px; font-weight:600; }
+
+    /* ── SECTION ── */
+    .section { padding:64px 5vw; max-width:1200px; margin:auto; }
+    .section-label { font-size:.75rem; font-weight:700; letter-spacing:.08em; color:var(--green); text-transform:uppercase; margin-bottom:6px; }
+    .section-title { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,2.5vw,2rem); margin-bottom:10px; }
+    .section-sub { color:var(--slate); max-width:520px; font-size:.92rem; }
+
+    /* HOW IT WORKS */
+    .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:28px; margin-top:40px; }
+    .step { text-align:center; }
+    .step-num { width:48px; height:48px; border-radius:50%; background:var(--green); color:#fff; font-size:1.1rem; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+    .step h3 { font-size:.92rem; font-weight:600; margin-bottom:5px; }
+    .step p { font-size:.83rem; color:var(--slate); }
+
+    /* ── CHECKER ── */
+    .checker-section { background:var(--white); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+    .checker-wrap { max-width:760px; margin:auto; padding:64px 5vw; }
+    .input-group { display:flex; gap:10px; margin-bottom:10px; }
+    .sym-input { flex:1; padding:13px 16px; border:1.5px solid var(--line); border-radius:var(--radius); font-size:.92rem; font-family:inherit; outline:none; transition:border-color .2s; }
+    .sym-input:focus { border-color:var(--green); }
+    #symptom-tags { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:18px; min-height:32px; }
+    .tag { display:inline-flex; align-items:center; gap:5px; background:var(--green-lt); color:var(--green); border-radius:20px; padding:5px 11px; font-size:.8rem; font-weight:500; }
+    .tag button { background:none; border:none; cursor:pointer; color:var(--green); font-size:.95rem; line-height:1; }
+    .common-symptoms p { font-size:.8rem; color:var(--muted); margin-bottom:7px; }
+    .common-chip { display:inline-block; border:1px solid var(--line); border-radius:20px; padding:4px 11px; font-size:.78rem; margin:2px; cursor:pointer; background:var(--bg); color:var(--slate); transition:all .15s; }
+    .common-chip:hover { border-color:var(--green); color:var(--green); background:var(--green-lt); }
+    #check-btn { width:100%; padding:14px; background:var(--green); color:#fff; border:none; border-radius:var(--radius); font-size:.95rem; font-weight:600; cursor:pointer; font-family:inherit; margin-top:18px; transition:background .2s; }
+    #check-btn:hover { background:#155f49; }
+    #check-btn:disabled { background:#a0aec0; cursor:not-allowed; }
+    #results { margin-top:32px; display:none; }
+    .result-card { background:var(--bg); border:1px solid var(--line); border-radius:var(--radius); padding:22px; margin-bottom:14px; }
+    .result-card.primary { border-color:var(--green); background:var(--green-lt); }
+    .rc-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+    .rc-title { font-weight:700; font-size:1rem; }
+    .severity { padding:3px 10px; border-radius:10px; font-size:.72rem; font-weight:700; }
+    .sev-low { background:#c6f6d5; color:#276749; }
+    .sev-medium { background:#feebc8; color:#7b341e; }
+    .sev-high { background:#fed7d7; color:#9b2c2c; }
+    .rc-body p { font-size:.86rem; color:var(--slate); margin-bottom:7px; }
+    .med-list { display:flex; flex-wrap:wrap; gap:7px; margin-top:7px; }
+    .med-pill { background:var(--white); border:1px solid var(--line); border-radius:8px; padding:5px 11px; font-size:.8rem; color:var(--slate); }
+    .med-pill strong { color:var(--navy); display:block; font-size:.82rem; }
+    .disclaimer { background:#fffbeb; border:1px solid #f6e05e; border-radius:var(--radius); padding:12px 16px; font-size:.8rem; color:#744210; margin-top:6px; display:flex; gap:9px; align-items:flex-start; }
+
+    /* ── DOCTORS ── */
+    .doctors-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:20px; margin-top:40px; }
+    .doc-card { background:var(--white); border:1px solid var(--line); border-radius:var(--radius); padding:22px; text-align:center; transition:box-shadow .2s; }
+    .doc-card:hover { box-shadow:var(--shadow); }
+    .doc-avatar { width:64px; height:64px; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; font-weight:700; color:#fff; }
+    .doc-name { font-weight:700; font-size:.92rem; margin-bottom:2px; }
+    .doc-spec { font-size:.8rem; color:var(--green); font-weight:500; margin-bottom:5px; }
+    .doc-meta { font-size:.78rem; color:var(--muted); margin-bottom:12px; }
+    .doc-btn { width:100%; padding:9px; border:1.5px solid var(--green); border-radius:8px; background:none; color:var(--green); font-weight:600; font-size:.82rem; cursor:pointer; transition:all .2s; font-family:inherit; }
+    .doc-btn:hover { background:var(--green); color:#fff; }
+
+    /* ── MODAL (shared) ── */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(15,33,57,.55); z-index:300; align-items:center; justify-content:center; padding:16px; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:var(--white); border-radius:20px; padding:32px; max-width:460px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,.18); position:relative; max-height:90vh; overflow-y:auto; }
+    .modal-close { position:absolute; top:14px; right:16px; background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--muted); }
+    .modal h2 { font-family:'Playfair Display',serif; font-size:1.35rem; margin-bottom:4px; }
+    .modal-sub { font-size:.85rem; color:var(--muted); margin-bottom:22px; }
+    .form-group { margin-bottom:14px; }
+    .form-group label { display:block; font-size:.82rem; font-weight:600; color:var(--navy); margin-bottom:5px; }
+    .form-group input, .form-group select { width:100%; padding:11px 13px; border:1.5px solid var(--line); border-radius:8px; font-size:.88rem; font-family:inherit; outline:none; transition:border-color .2s; color:var(--navy); }
+    .form-group input:focus, .form-group select:focus { border-color:var(--green); }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .submit-btn { width:100%; padding:13px; background:var(--green); color:#fff; border:none; border-radius:var(--radius); font-size:.92rem; font-weight:600; cursor:pointer; font-family:inherit; margin-top:6px; transition:background .2s; }
+    .submit-btn:hover { background:#155f49; }
+    .submit-btn:disabled { background:#a0aec0; cursor:not-allowed; }
+    .modal-switch { text-align:center; font-size:.83rem; color:var(--muted); margin-top:16px; }
+    .modal-switch a { color:var(--green); font-weight:600; cursor:pointer; text-decoration:none; }
+    .modal-switch a:hover { text-decoration:underline; }
+    .tab-btns { display:flex; gap:0; margin-bottom:22px; border:1.5px solid var(--line); border-radius:8px; overflow:hidden; }
+    .tab-btn { flex:1; padding:10px; border:none; background:none; font-family:inherit; font-size:.85rem; font-weight:600; cursor:pointer; color:var(--muted); transition:all .2s; }
+    .tab-btn.active { background:var(--green); color:#fff; }
+    .alert { padding:10px 14px; border-radius:8px; font-size:.83rem; margin-bottom:14px; }
+    .alert-error { background:#fff5f5; border:1px solid #feb2b2; color:#9b2c2c; }
+    .alert-success { background:#f0fff4; border:1px solid #9ae6b4; color:#276749; }
+    .success-msg { text-align:center; padding:12px 0; }
+    .success-msg .tick { font-size:2.8rem; margin-bottom:10px; }
+    .success-msg h3 { font-size:1.05rem; font-weight:700; margin-bottom:5px; }
+    .success-msg p { font-size:.85rem; color:var(--slate); }
+
+    /* FEATURES */
+    .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-top:40px; }
+    .feature-card { background:var(--white); border:1px solid var(--line); border-radius:var(--radius); padding:24px; }
+    .feature-icon { width:44px; height:44px; border-radius:10px; background:var(--green-lt); display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
+    .feature-icon svg { width:22px; height:22px; stroke:var(--green); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    .feature-card h3 { font-size:.92rem; font-weight:600; margin-bottom:6px; }
+    .feature-card p { font-size:.84rem; color:var(--slate); }
+
+    /* FOOTER */
+    footer { background:var(--navy); color:#a0aec0; padding:48px 5vw 28px; }
+    .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr; gap:40px; max-width:1100px; margin:0 auto 36px; }
+    .footer-brand .logo { color:#fff; margin-bottom:10px; font-size:1.2rem; }
+    .footer-brand p { font-size:.82rem; line-height:1.7; }
+    .footer-col h4 { color:#fff; font-size:.88rem; font-weight:600; margin-bottom:12px; }
+    .footer-col a { display:block; color:#a0aec0; font-size:.82rem; text-decoration:none; margin-bottom:7px; }
+    .footer-col a:hover { color:#fff; }
+    .footer-bottom { border-top:1px solid #2d3748; padding-top:20px; text-align:center; font-size:.78rem; max-width:1100px; margin:auto; }
+
+    .spinner { display:inline-block; width:16px; height:16px; border:2.5px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:7px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    @media(max-width:768px) {
+      .hero { grid-template-columns:1fr; }
+      .hero-visual { display:none; }
+      .nav-links { display:none; }
+      .footer-grid { grid-template-columns:1fr; }
+      .form-row { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    MediSense
+  </a>
+  <ul class="nav-links">
+    <li><a href="#checker">Symptom Check</a></li>
+    <li><a href="#doctors">Doctors</a></li>
+    <li><a href="#how">How It Works</a></li>
+  </ul>
+  <div class="nav-auth">
+    <!-- shown when logged out -->
+    <div id="auth-btns">
+      <button class="btn-ghost" onclick="openAuth('login')">Log In</button>
+      <button class="btn-nav"   onclick="openAuth('register')">Sign Up</button>
+    </div>
+    <!-- shown when logged in -->
+    <div id="user-info">
+      <span class="user-badge" id="user-badge">👤 Loading…</span>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="hero-badge">⚡ AI-Powered Health Assistant</div>
+    <h1>Know Your Health,<br/><span>Before You Worry</span></h1>
+    <p>Enter your symptoms, get instant AI-driven insights, medicine suggestions, and connect with top doctors — securely from anywhere.</p>
+    <div class="hero-btns">
+      <a href="#checker" class="btn-primary">Check Symptoms</a>
+      <a href="#doctors" class="btn-outline">Find a Doctor</a>
+    </div>
+    <div class="stat-pills">
+      <div class="stat"><strong>50K+</strong><span>Diagnoses</span></div>
+      <div class="stat"><strong>200+</strong><span>Doctors</span></div>
+      <div class="stat"><strong>95%</strong><span>Accuracy</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card">
+      <div class="hero-card-title">🩺 Live Symptom Analysis</div>
+      <div style="margin-bottom:10px;">
+        <span class="symptom-chip">Fever</span>
+        <span class="symptom-chip">Headache</span>
+        <span class="symptom-chip">Body ache</span>
+      </div>
+      <div class="result-row"><span class="result-label">Most Likely</span><span class="result-val">Viral Fever <span class="confidence">87%</span></span></div>
+      <div class="result-row"><span class="result-label">Severity</span><span class="result-val">Moderate</span></div>
+      <div class="result-row"><span class="result-label">Medicine</span><span class="result-val">Paracetamol 500mg</span></div>
+      <div class="result-row"><span class="result-label">See Doctor</span><span class="result-val" style="color:var(--green-md)">Within 24 hrs</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="background:var(--white); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+  <div class="section">
+    <div class="section-label">Process</div>
+    <div class="section-title">Three steps to feel better</div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><h3>Create Account</h3><p>Sign up as a patient or doctor. Your data stays private and encrypted.</p></div>
+      <div class="step"><div class="step-num">2</div><h3>Enter Symptoms</h3><p>Type or pick symptoms. Our AI matches them to likely conditions instantly.</p></div>
+      <div class="step"><div class="step-num">3</div><h3>Book a Doctor</h3><p>Book a video or clinic appointment with a verified specialist in seconds.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SYMPTOM CHECKER -->
+<section id="checker" class="checker-section">
+  <div class="checker-wrap">
+    <div class="section-label">AI Symptom Checker</div>
+    <div class="section-title">What are you feeling today?</div>
+    <p class="section-sub" style="margin-bottom:28px;">Add your symptoms below for an instant analysis.</p>
+
+    <div class="input-group">
+      <input id="sym-input" class="sym-input" type="text" placeholder="e.g. headache, sore throat…"/>
+      <button class="btn-primary" onclick="addSymptom()">Add</button>
+    </div>
+    <div id="symptom-tags"></div>
+    <div class="common-symptoms">
+      <p>Common symptoms — tap to add:</p>
+      <span class="common-chip" onclick="quickAdd('Fever')">🌡️ Fever</span>
+      <span class="common-chip" onclick="quickAdd('Headache')">🤕 Headache</span>
+      <span class="common-chip" onclick="quickAdd('Cough')">😷 Cough</span>
+      <span class="common-chip" onclick="quickAdd('Sore Throat')">🤒 Sore Throat</span>
+      <span class="common-chip" onclick="quickAdd('Body Ache')">💪 Body Ache</span>
+      <span class="common-chip" onclick="quickAdd('Fatigue')">😴 Fatigue</span>
+      <span class="common-chip" onclick="quickAdd('Nausea')">🤢 Nausea</span>
+      <span class="common-chip" onclick="quickAdd('Vomiting')">🤮 Vomiting</span>
+      <span class="common-chip" onclick="quickAdd('Diarrhea')">💊 Diarrhea</span>
+      <span class="common-chip" onclick="quickAdd('Chest Pain')">❤️ Chest Pain</span>
+      <span class="common-chip" onclick="quickAdd('Shortness of Breath')">🫁 Shortness of Breath</span>
+      <span class="common-chip" onclick="quickAdd('Runny Nose')">🤧 Runny Nose</span>
+      <span class="common-chip" onclick="quickAdd('Dizziness')">😵 Dizziness</span>
+      <span class="common-chip" onclick="quickAdd('Rash')">🔴 Rash</span>
+    </div>
+    <button id="check-btn" onclick="checkSymptoms()">Analyse Symptoms</button>
+
+    <div id="results">
+      <div class="disclaimer">
+        ⚠️ <span><strong>Medical Disclaimer:</strong> For informational use only. Always consult a qualified doctor before taking any medication.</span>
+      </div>
+      <div id="result-cards" style="margin-top:18px;"></div>
+      <div style="text-align:center; margin-top:20px;">
+        <a href="#doctors" class="btn-primary">Book a Doctor Consultation →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOCTORS -->
+<section id="doctors" class="section">
+  <div class="section-label">Find a Doctor</div>
+  <div class="section-title">Consult top specialists online</div>
+  <p class="section-sub">All doctors are verified and board-certified. Book instantly.</p>
+  <div class="doctors-grid" id="doctors-grid"><p style="color:var(--muted); margin-top:20px;">Loading doctors…</p></div>
+</section>
+
+<!-- FEATURES -->
+<section style="background:var(--white); border-top:1px solid var(--line);">
+  <div class="section">
+    <div class="section-label">Why MediSense</div>
+    <div class="section-title">Healthcare, reimagined</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg></div>
+        <h3>AI Symptom Analysis</h3><p>Trained model cross-references clinical records for accurate condition matches.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3>Verified Doctors</h3><p>Every doctor is background-verified, board-certified, and patient-reviewed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <h3>Video Consultations</h3><p>Talk face-to-face via encrypted HD video calls from your home.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3>Private & Secure</h3><p>Health data encrypted end-to-end. Passwords stored as bcrypt hashes in SQL.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <h3>Digital Prescriptions</h3><p>Receive legally valid e-prescriptions after your consultation.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <h3>Symptom History</h3><p>Logged-in patients get a full history of all past symptom checks saved to the database.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo" style="color:#fff; font-family:'Playfair Display',serif; font-size:1.2rem; display:flex; align-items:center; gap:7px; margin-bottom:10px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        MediSense
+      </div>
+      <p>AI-powered healthcare for everyone. Making quality medical guidance accessible from anywhere.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <a href="#checker">Symptom Checker</a>
+      <a href="#doctors">Find Doctors</a>
+      <a href="#">Health Records</a>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Medical Disclaimer</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2025 MediSense. All rights reserved. This service does not replace professional medical advice.</div>
+</footer>
+
+<!-- ══════════════════════════════════════════════════════════
+     AUTH MODAL  (Login / Register — Patient & Doctor)
+══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+    <div id="auth-body"></div>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="book-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeBook()">✕</button>
+    <div id="book-body"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════ -->
+<script>
+const API = '';   // same origin — change to 'http://localhost:3000' if running separately
+
+// ── State ────────────────────────────────────────────────────
+let currentUser  = JSON.parse(localStorage.getItem('ms_user')  || 'null');
+let currentToken = localStorage.getItem('ms_token') || null;
+let symptoms     = [];
+let doctorsCache = [];
+
+// Colour palette for doctor avatars
+const COLORS = ['#1a7a5e','#2c5282','#744210','#553c9a','#9b2c2c','#276749','#d53f8c','#c05621'];
+
+// ── Auth UI ──────────────────────────────────────────────────
+function updateNavAuth() {
+  if (currentUser) {
+    document.getElementById('auth-btns').style.display = 'none';
+    document.getElementById('user-info').style.display = 'flex';
+    document.getElementById('user-badge').textContent =
+      `${currentUser.role === 'doctor' ? '🩺' : '👤'} ${currentUser.name}`;
+  } else {
+    document.getElementById('auth-btns').style.display = 'flex';
+    document.getElementById('user-info').style.display = 'none';
+  }
+}
+
+function logout() {
+  localStorage.removeItem('ms_user');
+  localStorage.removeItem('ms_token');
+  currentUser = null; currentToken = null;
+  updateNavAuth();
+}
+
+// ── Open auth modal ──────────────────────────────────────────
+function openAuth(mode = 'login') {
+  renderAuthModal(mode, 'patient');
+  document.getElementById('auth-modal').classList.add('open');
+}
+function closeAuth() { document.getElementById('auth-modal').classList.remove('open'); }
+
+function renderAuthModal(mode, role) {
+  const isLogin = mode === 'login';
+  document.getElementById('auth-body').innerHTML = `
+    <h2>${isLogin ? 'Welcome back' : 'Create account'}</h2>
+    <p class="modal-sub">${isLogin ? 'Log in to access your health dashboard.' : 'Join MediSense — it\'s free.'}</p>
+
+    <div class="tab-btns">
+      <button class="tab-btn ${role==='patient'?'active':''}" onclick="renderAuthModal('${mode}','patient')">Patient</button>
+      <button class="tab-btn ${role==='doctor' ?'active':''}" onclick="renderAuthModal('${mode}','doctor')">Doctor</button>
+    </div>
+
+    <div id="auth-alert"></div>
+
+    ${!isLogin ? `<div class="form-group"><label>Full Name</label><input id="a-name" type="text" placeholder="Rahul Sharma"/></div>` : ''}
+    <div class="form-group"><label>Email</label><input id="a-email" type="email" placeholder="you@example.com"/></div>
+    <div class="form-group"><label>Password</label><input id="a-pass" type="password" placeholder="Min 6 characters"/></div>
+
+    ${!isLogin && role === 'patient' ? `
+      <div class="form-row">
+        <div class="form-group"><label>Phone</label><input id="a-phone" type="tel" placeholder="+91 98765 43210"/></div>
+        <div class="form-group"><label>Date of Birth</label><input id="a-dob" type="date"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Gender</label>
+          <select id="a-gender"><option value="">Select</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select>
+        </div>
+        <div class="form-group"><label>Blood Group</label>
+          <select id="a-blood"><option value="">Select</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select>
+        </div>
+      </div>` : ''}
+
+    ${!isLogin && role === 'doctor' ? `
+      <div class="form-group"><label>Phone</label><input id="a-phone" type="tel" placeholder="+91 98765 43210"/></div>
+      <div class="form-row">
+        <div class="form-group"><label>Specialization</label><input id="a-spec" type="text" placeholder="e.g. Cardiologist"/></div>
+        <div class="form-group"><label>Experience (years)</label><input id="a-exp" type="number" placeholder="5"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Consult Fee (₹)</label><input id="a-fee" type="number" placeholder="500"/></div>
+        <div class="form-group"></div>
+      </div>
+      <div class="form-group"><label>Short Bio</label><input id="a-bio" type="text" placeholder="MBBS, MD — specialises in…"/></div>` : ''}
+
+    <button class="submit-btn" id="auth-submit-btn" onclick="submitAuth('${mode}','${role}')">
+      ${isLogin ? 'Log In' : 'Create Account'}
+    </button>
+    <div class="modal-switch">
+      ${isLogin
+        ? `Don't have an account? <a onclick="renderAuthModal('register','${role}')">Sign up</a>`
+        : `Already have an account? <a onclick="renderAuthModal('login','${role}')">Log in</a>`}
+    </div>
+  `;
+}
+
+async function submitAuth(mode, role) {
+  const btn = document.getElementById('auth-submit-btn');
+  const alertEl = document.getElementById('auth-alert');
+  const email = document.getElementById('a-email')?.value.trim();
+  const password = document.getElementById('a-pass')?.value.trim();
+
+  if (!email || !password) { showAlert(alertEl, 'Email and password are required.', 'error'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Please wait…';
+
+  let endpoint, body;
+  if (mode === 'login') {
+    endpoint = `${API}/api/auth/${role}/login`;
+    body = { email, password };
+  } else {
+    const name = document.getElementById('a-name')?.value.trim();
+    if (!name) { showAlert(alertEl, 'Full name is required.', 'error'); btn.disabled=false; btn.textContent='Create Account'; return; }
+    endpoint = `${API}/api/auth/${role}/register`;
+    body = { full_name: name, email, password,
+      phone:        document.getElementById('a-phone')?.value.trim() || undefined,
+      dob:          document.getElementById('a-dob')?.value         || undefined,
+      gender:       document.getElementById('a-gender')?.value      || undefined,
+      blood_group:  document.getElementById('a-blood')?.value       || undefined,
+      specialization: document.getElementById('a-spec')?.value.trim() || undefined,
+      experience_yrs: document.getElementById('a-exp')?.value       || undefined,
+      consult_fee:  document.getElementById('a-fee')?.value         || undefined,
+      bio:          document.getElementById('a-bio')?.value.trim()  || undefined,
+    };
+  }
+
+  try {
+    const res  = await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data = await res.json();
+    if (!data.success) { showAlert(alertEl, data.message, 'error'); btn.disabled=false; btn.textContent = mode==='login'?'Log In':'Create Account'; return; }
+
+    currentToken = data.token;
+    currentUser  = data.user;
+    localStorage.setItem('ms_token', currentToken);
+    localStorage.setItem('ms_user',  JSON.stringify(currentUser));
+    updateNavAuth();
+    closeAuth();
+    showToast(`Welcome, ${currentUser.name}! 🎉`);
+  } catch {
+    showAlert(alertEl, 'Server error. Is the backend running?', 'error');
+    btn.disabled = false;
+    btn.textContent = mode === 'login' ? 'Log In' : 'Create Account';
+  }
+}
+
+function showAlert(el, msg, type) {
+  el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+}
+
+// ── Toast ────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1a7a5e;color:#fff;padding:12px 20px;border-radius:10px;font-size:.88rem;font-weight:600;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2);';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ── Symptom logic ────────────────────────────────────────────
+const diseaseDB = {
+  "Fever,Headache,Body Ache,Fatigue": {
+    name:"Viral Fever", severity:"medium",
+    description:"A common viral infection causing elevated body temperature and general discomfort.",
+    medicines:[{name:"Paracetamol 500mg",note:"Every 6 hrs"},{name:"Ibuprofen 400mg",note:"Pain & inflammation"},{name:"ORS Sachets",note:"Hydration"}],
+    advice:"Rest, drink fluids. See a doctor if fever exceeds 103°F or lasts 3+ days."
+  },
+  "Cough,Sore Throat,Runny Nose,Fever": {
+    name:"Common Cold / Flu", severity:"low",
+    description:"Upper respiratory tract viral infection.",
+    medicines:[{name:"Cetirizine 10mg",note:"Runny nose"},{name:"Dextromethorphan",note:"Cough suppressant"},{name:"Warm Gargles",note:"Sore throat"}],
+    advice:"Steam inhalation, warm fluids, rest. Antibiotics NOT needed."
+  },
+  "Nausea,Vomiting,Diarrhea": {
+    name:"Gastroenteritis", severity:"medium",
+    description:"Stomach and intestinal inflammation, usually viral or bacterial.",
+    medicines:[{name:"ORS Solution",note:"Every hour"},{name:"Ondansetron 4mg",note:"Anti-nausea"},{name:"Probiotic",note:"Gut recovery"}],
+    advice:"Avoid solid food, sip fluids. Doctor if symptoms last 48+ hours."
+  },
+  "Chest Pain,Shortness of Breath": {
+    name:"Possible Cardiac / Respiratory Event", severity:"high",
+    description:"This combination can indicate a serious cardiac or pulmonary condition.",
+    medicines:[{name:"⚠️ Do NOT self-medicate",note:"Seek emergency care"}],
+    advice:"CALL EMERGENCY SERVICES NOW. Requires immediate medical attention."
+  },
+  "Headache,Dizziness,Nausea": {
+    name:"Migraine / Vertigo", severity:"medium",
+    description:"Intense headache linked to neurological triggers, sometimes with dizziness.",
+    medicines:[{name:"Sumatriptan 50mg",note:"At onset"},{name:"Metoclopramide 10mg",note:"For nausea"},{name:"Rest in dark room",note:"Reduce stimuli"}],
+    advice:"Track triggers. Consult a neurologist if episodes are frequent."
+  },
+  "Fatigue,Dizziness,Headache": {
+    name:"Anaemia / Dehydration", severity:"low",
+    description:"Low haemoglobin or insufficient fluid intake.",
+    medicines:[{name:"Iron + Folic Acid",note:"Once daily"},{name:"Vitamin B12",note:"If deficient"},{name:"Increase water intake",note:"2-3L daily"}],
+    advice:"Get a CBC blood test. Eat iron-rich foods: spinach, lentils, eggs."
+  },
+  "Rash,Fever,Body Ache": {
+    name:"Viral Exanthem / Dengue (suspected)", severity:"high",
+    description:"Rash + fever + body pain can indicate dengue, measles, or other viral conditions.",
+    medicines:[{name:"Paracetamol ONLY",note:"AVOID aspirin & ibuprofen"},{name:"ORS",note:"Monitor platelet count"}],
+    advice:"Get NS1 antigen / dengue IgM test urgently. See a doctor TODAY."
+  }
+};
+const fallbackResult = {
+  name:"General Discomfort — Consult a Doctor", severity:"low",
+  description:"Your symptoms don't match a specific pattern. Could be mild or need personalised evaluation.",
+  medicines:[{name:"Paracetamol 500mg",note:"If fever/pain"},{name:"Stay Hydrated",note:"Drink water"}],
+  advice:"We recommend consulting one of our doctors for a personalised assessment."
+};
+
+function addSymptom() {
+  const inp = document.getElementById('sym-input');
+  const val = inp.value.trim();
+  if (val && !symptoms.includes(val)) { symptoms.push(val); renderTags(); }
+  inp.value = ''; inp.focus();
+}
+function quickAdd(s) { if (!symptoms.includes(s)) { symptoms.push(s); renderTags(); } }
+function removeSymptom(i) { symptoms.splice(i,1); renderTags(); }
+function renderTags() {
+  document.getElementById('symptom-tags').innerHTML =
+    symptoms.map((s,i) => `<span class="tag">${s}<button onclick="removeSymptom(${i})">×</button></span>`).join('');
+}
+document.getElementById('sym-input').addEventListener('keydown', e => { if(e.key==='Enter') addSymptom(); });
+
+function matchDisease() {
+  const syms = symptoms.map(s => s.toLowerCase());
+  let best = null, bestScore = 0;
+  for (const [key,val] of Object.entries(diseaseDB)) {
+    const keys = key.split(',').map(k => k.toLowerCase());
+    const matches = keys.filter(k => syms.some(s => s.includes(k) || k.includes(s))).length;
+    const score = matches / keys.length;
+    if (score > bestScore) { bestScore = score; best = {...val}; }
+  }
+  return bestScore >= 0.4 ? best : {...fallbackResult};
+}
+
+async function checkSymptoms() {
+  if (!symptoms.length) { alert('Please add at least one symptom.'); return; }
+  const btn = document.getElementById('check-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Analysing…';
+
+  setTimeout(async () => {
+    const res = matchDisease();
+
+    // Save to DB if logged in as patient
+    if (currentToken && currentUser?.role === 'patient') {
+      try {
+        await fetch(`${API}/api/symptom-check`, {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':`Bearer ${currentToken}`},
+          body: JSON.stringify({ symptoms: symptoms.join(', '), diagnosis: res.name, severity: res.severity, medicines: res.medicines })
+        });
+      } catch {}
+    }
+
+    const sevClass = s => s==='high'?'sev-high':s==='medium'?'sev-medium':'sev-low';
+    const sevLabel = s => s==='high'?'🔴 High':s==='medium'?'🟡 Moderate':'🟢 Low';
+
+    document.getElementById('result-cards').innerHTML = `
+      <div class="result-card primary">
+        <div class="rc-head">
+          <div class="rc-title">🩺 ${res.name}</div>
+          <span class="severity ${sevClass(res.severity)}">${sevLabel(res.severity)}</span>
+        </div>
+        <div class="rc-body">
+          <p>${res.description}</p>
+          <p><strong>💊 Suggested Medicines:</strong></p>
+          <div class="med-list">${res.medicines.map(m=>`<div class="med-pill"><strong>${m.name}</strong>${m.note}</div>`).join('')}</div>
+          <p style="margin-top:12px;"><strong>📋 Advice:</strong> ${res.advice}</p>
+          ${currentUser ? '<p style="margin-top:8px; color:var(--green); font-size:.8rem;">✅ This check has been saved to your history.</p>' : '<p style="margin-top:8px; color:var(--muted); font-size:.8rem;"><a onclick="openAuth(\'register\')" style="cursor:pointer; color:var(--green);">Sign up</a> to save your symptom history.</p>'}
+        </div>
+      </div>`;
+
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
+    btn.disabled = false; btn.textContent = 'Analyse Symptoms';
+  }, 1600);
+}
+
+// ── Doctors ──────────────────────────────────────────────────
+async function loadDoctors() {
+  try {
+    const res  = await fetch(`${API}/api/doctors`);
+    const data = await res.json();
+    doctorsCache = data.doctors || [];
+    renderDoctors(doctorsCache);
+  } catch {
+    // Fallback static list if server not running
+    doctorsCache = [
+      {id:1,full_name:'Dr. Priya Sharma',  specialization:'General Physician',  experience_yrs:12, rating:4.9, consult_fee:499},
+      {id:2,full_name:'Dr. Arjun Mehta',   specialization:'Internal Medicine',   experience_yrs:9,  rating:4.8, consult_fee:599},
+      {id:3,full_name:'Dr. Sunita Rao',    specialization:'Pulmonologist',       experience_yrs:15, rating:5.0, consult_fee:799},
+      {id:4,full_name:'Dr. Karan Batra',   specialization:'Neurologist',         experience_yrs:11, rating:4.7, consult_fee:899},
+      {id:5,full_name:'Dr. Meera Pillai',  specialization:'Cardiologist',        experience_yrs:18, rating:4.9, consult_fee:999},
+      {id:6,full_name:'Dr. Rohit Joshi',   specialization:'Dermatologist',       experience_yrs:7,  rating:4.6, consult_fee:549},
+      {id:7,full_name:'Dr. Anjali Singh',  specialization:'Paediatrician',       experience_yrs:13, rating:5.0, consult_fee:649},
+      {id:8,full_name:'Dr. Vikram Nair',   specialization:'Gastroenterologist',  experience_yrs:10, rating:4.8, consult_fee:749},
+    ];
+    renderDoctors(doctorsCache);
+  }
+}
+
+function renderDoctors(list) {
+  document.getElementById('doctors-grid').innerHTML = list.map((d,i) => {
+    const initials = d.full_name.split(' ').filter((_,j)=>j>0).map(w=>w[0]).join('').slice(0,2);
+    const stars = '★'.repeat(Math.round(d.rating)) + '☆'.repeat(5-Math.round(d.rating));
+    return `
+      <div class="doc-card">
+        <div class="doc-avatar" style="background:${COLORS[i%COLORS.length]}">${initials}</div>
+        <div class="doc-name">${d.full_name}</div>
+        <div class="doc-spec">${d.specialization}</div>
+        <div class="doc-meta">${d.experience_yrs} yrs · ${stars} ${d.rating}</div>
+        <div class="doc-meta">Consult fee: ₹${d.consult_fee}</div>
+        <button class="doc-btn" onclick="openBook(${i})">Book Appointment</button>
+      </div>`;
+  }).join('');
+}
+
+// ── Booking modal ────────────────────────────────────────────
+function openBook(idx) {
+  if (!currentUser) { openAuth('register'); showToast('Please sign in to book an appointment.'); return; }
+  if (currentUser.role === 'doctor') { showToast('Doctors cannot book appointments.'); return; }
+  const d = doctorsCache[idx];
+  document.getElementById('book-body').innerHTML = `
+    <h2>Book with ${d.full_name}</h2>
+    <p class="modal-sub">${d.specialization} · ₹${d.consult_fee} consultation fee</p>
+    <div id="book-alert"></div>
+    <div class="form-group"><label>Appointment Date</label><input type="date" id="bk-date" min="${new Date().toISOString().split('T')[0]}"/></div>
+    <div class="form-group"><label>Preferred Time</label>
+      <select id="bk-time">
+        <option value="09:00">09:00 AM</option><option value="10:00">10:00 AM</option>
+        <option value="11:00">11:00 AM</option><option value="12:00">12:00 PM</option>
+        <option value="14:00">02:00 PM</option><option value="15:00">03:00 PM</option>
+        <option value="16:00">04:00 PM</option><option value="17:00">05:00 PM</option>
+        <option value="18:00">06:00 PM</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Consultation Type</label>
+      <select id="bk-type"><option value="video">Video Consultation</option><option value="clinic">In-Clinic</option><option value="chat">Chat</option></select>
+    </div>
+    <div class="form-group"><label>Symptoms / Reason (optional)</label><input type="text" id="bk-sym" placeholder="e.g. Fever, headache for 2 days"/></div>
+    <button class="submit-btn" id="bk-btn" onclick="confirmBook(${d.id}, '${d.full_name}')">Confirm Appointment</button>
+  `;
+  document.getElementById('book-modal').classList.add('open');
+}
+function closeBook() { document.getElementById('book-modal').classList.remove('open'); }
+
+async function confirmBook(doctorId, docName) {
+  const btn  = document.getElementById('bk-btn');
+  const alrt = document.getElementById('book-alert');
+  const date = document.getElementById('bk-date').value;
+  const time = document.getElementById('bk-time').value;
+  const type = document.getElementById('bk-type').value;
+  const sym  = document.getElementById('bk-sym').value.trim();
+  if (!date) { showAlert(alrt, 'Please select a date.', 'error'); return; }
+
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Booking…';
+
+  try {
+    const res  = await fetch(`${API}/api/appointments`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${currentToken}`},
+      body: JSON.stringify({ doctor_id:doctorId, appt_date:date, appt_time:time, consult_type:type, symptoms_noted:sym })
+    });
+    const data = await res.json();
+    if (!data.success) { showAlert(alrt, data.message, 'error'); btn.disabled=false; btn.textContent='Confirm Appointment'; return; }
+
+    document.getElementById('book-body').innerHTML = `
+      <div class="success-msg">
+        <div class="tick">✅</div>
+        <h3>Appointment Confirmed!</h3>
+        <p>Your appointment with <strong>${docName}</strong> is booked for <strong>${new Date(date+'T12:00:00').toDateString()}</strong> at <strong>${time}</strong>.</p>
+        <p style="margin-top:8px; font-size:.8rem; color:var(--muted);">Appointment ID: #${data.appointment_id}</p>
+        <button class="submit-btn" style="margin-top:18px;" onclick="closeBook()">Done</button>
+      </div>`;
+  } catch {
+    // Offline fallback
+    document.getElementById('book-body').innerHTML = `
+      <div class="success-msg">
+        <div class="tick">✅</div>
+        <h3>Appointment Noted!</h3>
+        <p>Your appointment with <strong>${docName}</strong> on <strong>${new Date(date+'T12:00:00').toDateString()}</strong> has been recorded.</p>
+        <p style="margin-top:6px;font-size:.78rem;color:var(--muted);">Connect the backend to save this to the database.</p>
+        <button class="submit-btn" style="margin-top:18px;" onclick="closeBook()">Done</button>
+      </div>`;
+  }
+}
+
+// Close modals on overlay click
+['auth-modal','book-modal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => { if(e.target.id===id) { closeAuth(); closeBook(); } });
+});
+
+// ── Init ─────────────────────────────────────────────────────
+updateNavAuth();
+loadDoctors();
+</script>
+</body>
+</html>

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediSense — Smart Health, Simplified</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tabler Icons (free icon library) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+
+  <!-- Our CSS files (load order matters) -->
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
+  <link rel="stylesheet" href="css/home.css" />
+  <link rel="stylesheet" href="css/modal.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     NAVIGATION BAR
+     Fixed at top. JS adds "scrolled" class on scroll.
+     JS also replaces the login buttons with user avatar
+     when a user is logged in (auth.js handles this).
+══════════════════════════════════════════════ -->
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark"><i class="ti ti-heart-rate-monitor"></i></div>
+    <span class="nav-brand">MediSense</span>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#how-it-works">How it works</a></li>
+    <li><a href="#checker">Symptom Check</a></li>
+    <li><a href="#doctors">Find Doctors</a></li>
+    <li><a href="pages/medicines.html">Order Medicines</a></li>
+    <li><a href="pages/medical-history.html">My Health</a></li>
+    <li><a href="#appointments">Appointments</a></li>
+  </ul>
+
+  <!-- JS replaces this div content after login -->
+  <div class="nav-right" id="nav-right">
+    <a href="pages/patient-login.html" class="btn-outline">Patient Login</a>
+    <a href="pages/doctor-login.html" class="btn-filled">Doctor Login</a>
+  </div>
+</nav>
+
+
+<!-- ══════════════════════════════════════════════
+     HERO SECTION
+     The big intro banner — first thing visitor sees.
+══════════════════════════════════════════════ -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-blob"></div>
+
+  <div class="hero-inner">
+
+    <!-- Left: text content -->
+    <div class="hero-content reveal">
+      <div class="hero-badge"><i class="ti ti-sparkles"></i> AI-Powered Healthcare</div>
+
+      <h1 class="hero-headline">
+        Smart health,<br/><em>simplified</em> for India
+      </h1>
+
+      <p class="hero-sub">
+        Describe your symptoms, get AI-driven insights, find the right
+        medicine, and book a doctor — all in one place.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#checker" class="btn-primary"><i class="ti ti-stethoscope"></i> Check Symptoms</a>
+        <a href="#doctors" class="btn-secondary"><i class="ti ti-user-heart"></i> Find Doctors</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item"><span class="stat-number">50k+</span><span class="stat-label">Patients helped</span></div>
+        <div class="stat-item"><span class="stat-number">800+</span><span class="stat-label">Verified doctors</span></div>
+        <div class="stat-item"><span class="stat-number">98%</span><span class="stat-label">Satisfaction rate</span></div>
+      </div>
+    </div>
+
+    <!-- Right: animated demo card (hidden on mobile) -->
+    <div class="hero-visual reveal">
+      <div class="floating-badge badge-top">
+        <span class="green-dot"></span> Dr. Priya is available now
+      </div>
+
+      <div class="demo-symptom-card">
+        <div class="demo-card-title"><i class="ti ti-stethoscope"></i> Symptom Checker</div>
+        <div class="demo-chips">
+          <span class="chip selected">Fever</span>
+          <span class="chip selected">Cough</span>
+          <span class="chip selected">Headache</span>
+          <span class="chip">Nausea</span>
+        </div>
+        <div class="demo-result">
+          <div class="result-label">Most likely condition</div>
+          <div class="result-name">Common Cold / Influenza</div>
+          <div class="result-bar-wrap"><div class="result-bar"></div></div>
+          <div class="result-confidence">82% match confidence</div>
+        </div>
+      </div>
+
+      <div class="floating-badge badge-bottom">
+        <i class="ti ti-calendar-check" style="color:var(--green)"></i> Appointment confirmed!
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     HOW IT WORKS — 3 steps
+══════════════════════════════════════════════ -->
+<section class="how-section" id="how-it-works">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-tag">Simple process</span>
+      <h2 class="section-title">From symptom to solution<br/>in 3 easy steps</h2>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-card reveal">
+        <div class="step-number">01</div>
+        <div class="step-icon"><i class="ti ti-mood-sick"></i></div>
+        <h3 class="step-title">Enter your symptoms</h3>
+        <p class="step-desc">Choose from common symptoms or type your own. AI understands natural language.</p>
+        <div class="step-connector"><i class="ti ti-arrow-right"></i></div>
+      </div>
+
+      <div class="step-card reveal">
+        <div class="step-number">02</div>
+        <div class="step-icon"><i class="ti ti-brain"></i></div>
+        <h3 class="step-title">Get AI diagnosis</h3>
+        <p class="step-desc">AI analyzes your symptoms against thousands of conditions with confidence scores.</p>
+        <div class="step-connector"><i class="ti ti-arrow-right"></i></div>
+      </div>
+
+      <div class="step-card reveal">
+        <div class="step-number">03</div>
+        <div class="step-icon"><i class="ti ti-calendar-plus"></i></div>
+        <h3 class="step-title">Book a doctor</h3>
+        <p class="step-desc">Connect with verified specialists and book consultations in minutes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SYMPTOM CHECKER — the interactive tool
+     symptom-checker.js handles all the logic.
+══════════════════════════════════════════════ -->
+<section class="checker-section" id="checker">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-tag">AI Symptom Checker</span>
+      <h2 class="section-title">What are you feeling today?</h2>
+    </div>
+
+    <div class="checker-layout">
+
+      <!-- Input panel -->
+      <div class="checker-input-panel reveal">
+        <p class="input-label">SELECT SYMPTOMS</p>
+
+        <!-- Each button has data-symptom attribute — JS reads it -->
+        <div class="symptom-grid" id="symptom-grid">
+          <button class="symptom-btn" data-symptom="Fever">🌡️ Fever</button>
+          <button class="symptom-btn" data-symptom="Headache">🧠 Headache</button>
+          <button class="symptom-btn" data-symptom="Cough">😮‍💨 Cough</button>
+          <button class="symptom-btn" data-symptom="Fatigue">😴 Fatigue</button>
+          <button class="symptom-btn" data-symptom="Sore throat">🔴 Sore throat</button>
+          <button class="symptom-btn" data-symptom="Body pain">💪 Body pain</button>
+          <button class="symptom-btn" data-symptom="Nausea">🤢 Nausea</button>
+          <button class="symptom-btn" data-symptom="Chest pain">❤️ Chest pain</button>
+          <button class="symptom-btn" data-symptom="Runny nose">💧 Runny nose</button>
+          <button class="symptom-btn" data-symptom="Dizziness">🌀 Dizziness</button>
+          <button class="symptom-btn" data-symptom="Rash">🔸 Rash</button>
+          <button class="symptom-btn" data-symptom="Breathlessness">💨 Breathlessness</button>
+        </div>
+
+        <p class="input-label" style="margin-top:16px">OR TYPE A SYMPTOM</p>
+        <div class="custom-input-row">
+          <input type="text" id="custom-symptom-input" class="custom-input" placeholder="e.g. stomach cramps..." />
+          <button class="btn-primary small" id="add-symptom-btn">Add</button>
+        </div>
+
+        <!-- Custom typed symptoms appear here as tags -->
+        <div id="custom-symptom-tags" class="custom-tags"></div>
+
+        <button class="analyze-button" id="analyze-btn">
+          <i class="ti ti-search-check"></i> Analyze Symptoms
+        </button>
+      </div>
+
+      <!-- Results panel — filled by symptom-checker.js -->
+      <div class="results-panel reveal" id="results-panel">
+        <div class="results-empty">
+          <i class="ti ti-clipboard-heart"></i>
+          <strong>Select symptoms to begin</strong>
+          <span>Your results will appear here</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     FIND DOCTORS
+     doctors.js fetches from API and renders cards.
+══════════════════════════════════════════════ -->
+<section class="doctors-section" id="doctors">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-tag">Find Doctors</span>
+      <h2 class="section-title">800+ verified specialists,<br/>ready to help</h2>
+    </div>
+
+    <!-- Filter buttons — data-filter attribute read by doctors.js -->
+    <div class="doctor-filters reveal" id="doctor-filters">
+      <button class="filter-btn active" data-filter="all">All Doctors</button>
+      <button class="filter-btn" data-filter="General Physician">General Physician</button>
+      <button class="filter-btn" data-filter="Pulmonology">Pulmonology</button>
+      <button class="filter-btn" data-filter="ENT">ENT</button>
+      <button class="filter-btn" data-filter="Cardiology">Cardiology</button>
+      <button class="filter-btn" data-filter="Dermatology">Dermatology</button>
+      <button class="filter-btn" data-filter="Neurology">Neurology</button>
+    </div>
+
+    <!-- Cards injected here by doctors.js -->
+    <div class="doctors-grid" id="doctors-grid">
+      <div class="loading-placeholder">
+        <i class="ti ti-loader loading-spinner"></i>
+        Loading doctors...
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     FEATURES — dark navy background
+══════════════════════════════════════════════ -->
+<section class="features-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-tag dark">Why MediSense</span>
+      <h2 class="section-title light">Everything you need,<br/>nothing you don't</h2>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon"><i class="ti ti-brain"></i></div>
+        <h3 class="feature-title">AI-powered diagnosis</h3>
+        <p class="feature-desc">ML trained on millions of cases matches your symptoms with high accuracy.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon"><i class="ti ti-shield-check"></i></div>
+        <h3 class="feature-title">Verified doctors only</h3>
+        <p class="feature-desc">Every doctor is NMC license-verified before joining our platform.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon"><i class="ti ti-video"></i></div>
+        <h3 class="feature-title">Video consultations</h3>
+        <p class="feature-desc">Talk to a doctor from home. No travel, no waiting rooms.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon"><i class="ti ti-pill"></i></div>
+        <h3 class="feature-title">Medicine delivery</h3>
+        <p class="feature-desc">Order medicines online with next-day delivery to your door.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon"><i class="ti ti-language"></i></div>
+        <h3 class="feature-title">Regional languages</h3>
+        <p class="feature-desc">Hindi, Punjabi, Bengali, Tamil — healthcare in your language.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon"><i class="ti ti-currency-rupee"></i></div>
+        <h3 class="feature-title">Affordable care</h3>
+        <p class="feature-desc">Consultations starting at ₹200. Transparent, no hidden fees.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     TESTIMONIALS
+══════════════════════════════════════════════ -->
+<section class="testimonials-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-tag">Patient stories</span>
+      <h2 class="section-title">Trusted by thousands across India</h2>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <div class="quote-mark">"</div>
+        <p class="testimonial-text">MediSense identified dengue and told me to go immediately. It turned out to be right. This app probably saved my life.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">RS</div>
+          <div><div class="author-name">Rahul Sharma</div><div class="author-location">Ludhiana, Punjab</div></div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal">
+        <div class="quote-mark">"</div>
+        <p class="testimonial-text">Booked a cardiologist at 11pm when I had chest discomfort. The doctor called back within 20 minutes. Incredible.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">PK</div>
+          <div><div class="author-name">Preethi Kumar</div><div class="author-location">Bengaluru, Karnataka</div></div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal">
+        <div class="quote-mark">"</div>
+        <p class="testimonial-text">As a mother of two, I can quickly check symptoms and order medicines. MediSense is now part of our family routine.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">AN</div>
+          <div><div class="author-name">Anjali Nair</div><div class="author-location">Kochi, Kerala</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     MY APPOINTMENTS
+     appointments.js fetches from API and renders.
+     Falls back to localStorage if not logged in.
+══════════════════════════════════════════════ -->
+<section class="appointments-section" id="appointments">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-tag">My Appointments</span>
+      <h2 class="section-title">Your upcoming consultations</h2>
+    </div>
+
+    <!-- JS fills this div -->
+    <div id="appointments-list" class="appointments-list">
+      <div class="empty-state">
+        <i class="ti ti-calendar-off"></i>
+        <p>No appointments yet. Book a doctor above!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     CALL TO ACTION BANNER
+══════════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-title">Start your health journey today</h2>
+    <p class="cta-sub">Join 50,000+ Indians who trust MediSense for smarter, faster healthcare.</p>
+    <div class="cta-buttons">
+      <a href="pages/patient-login.html" class="btn-primary large"><i class="ti ti-user-plus"></i> Create Free Account</a>
+      <a href="pages/medicines.html" class="btn-white-outline large"><i class="ti ti-pill"></i> Order Medicines</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand-col">
+        <div class="footer-brand-name">MediSense</div>
+        <p class="footer-tagline">AI-powered healthcare for every Indian. Symptom checker, doctor booking, and medicine delivery.</p>
+        <div class="footer-social">
+          <span class="social-icon"><i class="ti ti-brand-twitter"></i></span>
+          <span class="social-icon"><i class="ti ti-brand-instagram"></i></span>
+          <span class="social-icon"><i class="ti ti-brand-linkedin"></i></span>
+          <span class="social-icon"><i class="ti ti-brand-whatsapp"></i></span>
+        </div>
+      </div>
+
+      <div class="footer-links-col">
+        <h4 class="footer-col-title">Product</h4>
+        <ul class="footer-links">
+          <li><a href="#checker">Symptom Checker</a></li>
+          <li><a href="#doctors">Find Doctors</a></li>
+          <li><a href="pages/medicines.html">Order Medicines</a></li>
+          <li><a href="pages/medical-history.html">My Health</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-col">
+        <h4 class="footer-col-title">For Doctors</h4>
+        <ul class="footer-links">
+          <li><a href="pages/doctor-login.html">Doctor Login</a></li>
+          <li><a href="pages/doctor-login.html">Join as Doctor</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-col">
+        <h4 class="footer-col-title">Company</h4>
+        <ul class="footer-links">
+          <li><a href="#">About us</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Use</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>
+        <p>© 2025 MediSense Health Pvt. Ltd. All rights reserved.</p>
+        <p class="footer-disclaimer">⚠️ MediSense is for informational purposes only and does not replace professional medical advice.</p>
+      </div>
+      <div class="footer-badge"><i class="ti ti-shield-check"></i> DPDP Compliant</div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ══════════════════════════════════════════════
+     BOOKING MODAL
+     Opens when user clicks "Book Appointment".
+     booking.js handles all the logic inside.
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="booking-modal">
+  <div class="modal-box">
+
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Book Appointment</h3>
+        <p class="modal-subtitle" id="modal-doctor-name">Select a date and time</p>
+      </div>
+      <button class="modal-close-btn" id="modal-close-btn"><i class="ti ti-x"></i></button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Doctor summary filled by booking.js -->
+      <div class="modal-doctor-card" id="modal-doctor-card"></div>
+
+      <p class="modal-section-label">SELECT DATE</p>
+      <div class="date-scroll-row" id="date-scroll-row"></div>
+
+      <p class="modal-section-label">CONSULTATION TYPE</p>
+      <div class="consult-type-row">
+        <div class="consult-option selected" id="option-inperson" data-mode="in_person">
+          <i class="ti ti-building-hospital"></i>
+          <div class="consult-name">In-Person</div>
+          <div class="consult-price" id="price-inperson">₹400</div>
+        </div>
+        <div class="consult-option" id="option-online" data-mode="online">
+          <i class="ti ti-video"></i>
+          <div class="consult-name">Online Video</div>
+          <div class="consult-price" id="price-online">₹300</div>
+        </div>
+      </div>
+
+      <!-- Green/red message after availability check -->
+      <div id="availability-message" class="availability-message" style="display:none"></div>
+
+      <p class="modal-section-label">
+        AVAILABLE SLOTS — <span id="selected-date-label">Select a date above</span>
+      </p>
+      <!-- Time slots grid filled by booking.js -->
+      <div class="slots-grid" id="slots-grid">
+        <p class="slots-placeholder">Select a date to see available slots</p>
+      </div>
+
+      <p class="modal-section-label" style="margin-top:16px">REASON FOR VISIT (OPTIONAL)</p>
+      <textarea class="reason-textarea" id="reason-textarea" placeholder="Describe your symptoms or reason for this visit..."></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" id="modal-cancel-btn">Cancel</button>
+      <button class="btn-primary" id="modal-confirm-btn" disabled>
+        <i class="ti ti-calendar-check"></i> Confirm & Pay
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- Toast notification (bottom center popup) -->
+<div class="toast" id="toast">
+  <i class="ti ti-check" id="toast-icon"></i>
+  <span id="toast-message"></span>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT — loaded at bottom so HTML renders first
+══════════════════════════════════════════════ -->
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/symptom-checker.js"></script>
+<script src="js/doctors.js"></script>
+<script src="js/booking.js"></script>
+<script src="js/appointments.js"></script>
+<script src="js/animations.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>

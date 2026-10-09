@@ -1,0 +1,29 @@
+# ============================================================
+# .gitignore — files NOT pushed to GitHub
+# ============================================================
+
+# Node.js dependencies (install with: npm install)
+node_modules/
+
+# Environment variables — NEVER push this to GitHub
+# It contains passwords, API keys, and secrets
+.env
+
+# Uploaded files (prescriptions, profile photos, documents)
+backend/uploads/
+
+# Mac OS system file
+.DS_Store
+
+# Windows system file
+Thumbs.db
+
+# VS Code editor settings
+.vscode/
+
+# npm debug log
+npm-debug.log*
+
+# Production build output (if you add a build step later)
+dist/
+build/
